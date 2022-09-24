@@ -5,18 +5,18 @@ import datetime
 
 
 '''
-This file has all datafile classes
-It includes an abstract class Data that to be used as a template for all data classes
-It also includes all the data classes that inherit from the Data class
+    This file has all datafile classes
+    It includes an abstract class Data that to be used as a template for all data classes
+    It also includes all the data classes that inherit from the Data class
 '''
 
 
 @dataclass
 class Data(ABC):                                                                #abstact class that acts as a template
-
                                                                                 #classes must implement the following
     @abstractmethod
-    def __init__(self) -> None:                                                 #initialise data
+    def __init__(self) -> None:                                                 #init data
+        # return (re.escape(i) for i in list_of_params)
         pass
 
     @abstractmethod
@@ -31,7 +31,7 @@ class Data(ABC):                                                                
         result = ""
         for i in list_of_params:
             result+='"'+i+'"'+','
-        return result[:-1]                                                      #don't return last ,
+        return result[:-1]+'\n'                                                 #don't return last ,
 
 
 @dataclass
