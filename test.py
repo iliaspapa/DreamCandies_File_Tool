@@ -91,14 +91,14 @@ def generate_invoices():
         customere_code = RandomString(random.randint(1,30))
         invoice_code = RandomString(random.randint(1,30))
         amound = random.uniform(0.0,1000.0)
-        date = fake.date_time_between(start_date='-30y', end_date='=30y')
+        date = fake.date_time_between(start_date='-30y', end_date='+30y')
         invoices.append((customere_code.get_string(),invoice_code.get_string(),amound,date))
     
     return invoices
 
 
 
-def test_dataclass_customers_init(generate_invoices):
+def test_dataclass_invoices_init(generate_invoices):
     for invoice in generate_invoices:
         invoice_object = fd.Invoice(invoice[0],invoice[1],invoice[2],invoice[3])
         assert invoice_object.CUSTOMER_CODE == invoice[0]
@@ -108,11 +108,11 @@ def test_dataclass_customers_init(generate_invoices):
 
 
 
-def test_dataclass_customers_write_in_file(generate_invoices):
+def test_dataclass_invoices_write_in_file(generate_invoices):
     
     with open("tmp.csv",'w') as temp_file:
         for invoice in generate_invoices:
-            invoice_object = fd.Customer(invoice[0],invoice[1],invoice[2],invoice[3])
+            invoice_object = fd.Invoice(invoice[0],invoice[1],invoice[2],invoice[3])
             invoice_object.write_in_file(temp_file)
     
     with open("tmp.csv",'r') as temp_file:
@@ -123,71 +123,70 @@ def test_dataclass_customers_write_in_file(generate_invoices):
 
             correct_format = '"'+generate_invoices[cnt][0]+'","'\
                                 +generate_invoices[cnt][1]+'","'\
-                                +generate_invoices[cnt][2]+'","'\
-                                +generate_invoices[cnt][3]+'"\n'
+                                +str(generate_invoices[cnt][2])+'","'\
+                                +str(generate_invoices[cnt][3])+'"\n'
 
             assert line==correct_format
             cnt+=1
 
-def test_dataclass_customers_return_key(generate_invoices):
+def test_dataclass_invoices_return_key(generate_invoices):
     for invoice in generate_invoices:
         invoice_object = fd.Invoice(invoice[0],invoice[1],invoice[2],invoice[3])
-        assert invoice_object.return_key() == invoice[0]
+        assert invoice_object.return_key() == invoice[1]
 
 '''
-            Test dataclasses.customers
+            Test dataclasses.invoice_items
 '''
-'''
+
 @pytest.fixture
-def generate_customers():
+def generate_invoice_items():
 
-    customars = []
+    items = []
 
     for i in range(100):
-        customare_code = RandomString(random.randint(1,30))
-        first_name = RandomString(random.randint(1,100))
-        last_name = RandomString(random.randint(1,100))
-        customars.append((customare_code.get_string(),first_name.get_string(),last_name.get_string()))
+        invoice_code = RandomString(random.randint(1,30))
+        item_code = RandomString(random.randint(1,30))
+        amound = random.uniform(0.0,1000.0)
+        quantity = random.randint(1,100)
+        items.append((invoice_code.get_string(),item_code.get_string(),amound,quantity))
     
-    return customars
+    return items
 
 
 
-def test_dataclass_customers_init(generate_customers):
-    for customer in generate_customers:
-        customer_object = fd.Customer(customer[0],customer[1],customer[2])
-        assert customer_object.CUSTOMER_CODE == customer[0]
-        assert customer_object.FIRST_NAME == customer[1]
-        assert customer_object.LAST_NAME == customer[2] 
+def test_dataclass_invoice_items_init(generate_invoice_items):
+    for item in generate_invoice_items:
+        item_obect = fd.InvoiceItem(item[0],item[1],item[2],item[3])
+        assert item_obect.INVOICE_CODE == item[0]
+        assert item_obect.ITEM_CODE == item[1]
+        assert item_obect.AMOUND == item[2] 
+        assert item_obect.QUANTITY == item[3] 
 
 
 
-def test_dataclass_customers_write_in_file(generate_customers):
+def test_dataclass_invoice_items_write_in_file(generate_invoice_items):
     
     with open("tmp.csv",'w') as temp_file:
-        for customer in generate_customers:
-            customer_object = fd.Customer(customer[0],customer[1],customer[2])
-            customer_object.write_in_file(temp_file)
+        for item in generate_invoice_items:
+            item_object = fd.InvoiceItem(item[0],item[1],item[2],item[3])
+            item_object.write_in_file(temp_file)
     
     with open("tmp.csv",'r') as temp_file:
         cnt = 0
         for line in temp_file:
 
-            assert cnt<len(generate_customers)
+            assert cnt<len(generate_invoice_items)
 
-            correct_format = '"'+generate_customers[cnt][0]+'","'\
-                                +generate_customers[cnt][1]+'","'\
-                                +generate_customers[cnt][2]+'"\n'
+            correct_format = '"'+generate_invoice_items[cnt][0]+'","'\
+                                +generate_invoice_items[cnt][1]+'","'\
+                                +str(generate_invoice_items[cnt][2])+'","'\
+                                +str(generate_invoice_items[cnt][3])+'"\n'
 
             assert line==correct_format
             cnt+=1
 
-def test_dataclass_customers_return_key(generate_customers):
-    for customer in generate_customers:
-        customer_object = fd.Customer(customer[0],customer[1],customer[2])
-        assert customer_object.return_key() == customer[0]
+def test_dataclass_invoice_items_return_key(generate_invoice_items):
+    for item in generate_invoice_items:
+        item_object = fd.InvoiceItem(item[0],item[1],item[2],item[3])
+        assert item_object.return_key() == item[1]
 
-
-
-
-'''

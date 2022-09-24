@@ -30,7 +30,7 @@ class Data(ABC):                                                                
     def make_mycsv_format(self,list_of_params) -> str:                          #return data in a printable format
         result = ""
         for i in list_of_params:
-            result+='"'+i+'"'+','
+            result+='"'+str(i)+'"'+','
         return result[:-1]+'\n'                                                 #don't return last ,
 
 
