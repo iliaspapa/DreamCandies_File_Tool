@@ -1,0 +1,2 @@
+# ignore csv files they are for testing
+*.CSV
