@@ -2,8 +2,10 @@ import pytest
 import string
 import random
 from faker import Faker
+import filecmp
 
 import file_tool.file_data_classes as fd
+import file_tool.datastructures as ds
 
 
 '''
@@ -17,7 +19,7 @@ class RandomString:                                                             
     string: str                                                                                 #random strings
 
     def __init__(self,length):                                                                  #generate a string with
-        letters = string.ascii_letters+string.punctuation+string.digits                         #given length
+        letters = string.ascii_letters+string.punctuation+string.digits                         #given max length
         self.string = ''.join(random.choice(letters) for i in range(random.randint(1,length)))  #since there are no specs
                                                                                                 #we test with all nonwhitespace
                                                                                                 #printables
@@ -35,10 +37,11 @@ def generate_customers():
     customers = []
 
     for i in range(100):
-        customere_code = RandomString(random.randint(1,30))
-        first_name = RandomString(random.randint(1,100))
-        last_name = RandomString(random.randint(1,100))
-        customers.append((customere_code.get_string(),first_name.get_string(),last_name.get_string()))
+        customere_code = RandomString(30)
+        first_name = RandomString(100)
+        last_name = RandomString(100)
+        customers.append((customere_code.get_string(),first_name.get_string(),\
+                                                      last_name.get_string()))
     
     return customers
 
@@ -88,8 +91,8 @@ def generate_invoices():
     invoices = []
     fake = Faker()
     for i in range(100):
-        customere_code = RandomString(random.randint(1,30))
-        invoice_code = RandomString(random.randint(1,30))
+        customere_code = RandomString(30)
+        invoice_code = RandomString(30)
         amound = random.uniform(0.0,1000.0)
         date = fake.date_time_between(start_date='-30y', end_date='+30y')
         invoices.append((customere_code.get_string(),invoice_code.get_string(),amound,date))
@@ -144,8 +147,8 @@ def generate_invoice_items():
     items = []
 
     for i in range(100):
-        invoice_code = RandomString(random.randint(1,30))
-        item_code = RandomString(random.randint(1,30))
+        invoice_code = RandomString(30)
+        item_code = RandomString(30)
         amound = random.uniform(0.0,1000.0)
         quantity = random.randint(1,100)
         items.append((invoice_code.get_string(),item_code.get_string(),amound,quantity))
@@ -190,3 +193,79 @@ def test_dataclass_invoice_items_return_key(generate_invoice_items):
         item_object = fd.InvoiceItem(item[0],item[1],item[2],item[3])
         assert item_object.return_key() == item[1]
 
+
+
+'''
+                Test datastructures
+'''
+
+@pytest.fixture
+def generate_customers_and_invoice_items():
+
+    customers = []
+
+    for i in range(100):
+        customer_code = RandomString(30)
+        first_name = RandomString(100)
+        last_name = RandomString(100)
+        customers.append(fd.Customer(customer_code.get_string(),first_name.get_string()\
+                                                               ,last_name.get_string()))
+    
+    items = []
+
+    for i in range(100):
+        invoice_code = RandomString(30)
+        item_code = RandomString(30)
+        amound = random.uniform(0.0,1000.0)
+        quantity = random.randint(1,100)
+        items.append(fd.InvoiceItem(invoice_code.get_string(),item_code.get_string(),\
+                                                                    amound,quantity))
+    
+    return customers, items
+
+def test_data_list(generate_customers_and_invoice_items):
+    
+    for collection in generate_customers_and_invoice_items:
+
+        dl = ds.DataLists(type(collection[0]))
+        for entry in collection:
+            dl.append(entry)
+        
+        dl_result = dl.return_list()
+        assert dl_result == collection
+        
+        with open("tmp1.csv",'w') as temp_file:
+            dl.write_in_file(temp_file)
+        
+        with open("tmp2.csv",'w') as temp_file:
+            for entry in collection:
+                entry.write_in_file(temp_file)
+        
+        assert filecmp.cmp("tmp1.csv","tmp2.csv")
+
+def test_data_dict(generate_customers_and_invoice_items):
+
+    for collection in generate_customers_and_invoice_items:
+
+        dd = ds.DataDict(type(collection[0]))
+        for entry in collection:
+            dd.add_to_dictionary(entry)
+        
+        dd_result = dd.return_list()
+        assert dd_result == collection
+        
+        dd2 = ds.DataDict(type(collection[0]))
+        for entry in collection:
+            dd2[entry.return_key()] = entry
+        
+        dd2_result = dd2.return_list()
+        assert dd2_result == collection
+
+        with open("tmp1.csv",'w') as temp_file:
+            dd.write_in_file(temp_file)
+        
+        with open("tmp2.csv",'w') as temp_file:
+            for entry in collection:
+                entry.write_in_file(temp_file)
+        
+        assert filecmp.cmp("tmp1.csv","tmp2.csv")

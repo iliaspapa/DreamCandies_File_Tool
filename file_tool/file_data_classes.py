@@ -14,7 +14,7 @@ import datetime
 @dataclass
 class Data(ABC):                                                                #abstact class that acts as a template
                                                                                 #classes must implement the following
-    @abstractmethod
+
     def __init__(self) -> None:                                                 #init data
         # return (re.escape(i) for i in list_of_params)
         pass
