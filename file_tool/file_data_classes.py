@@ -35,6 +35,22 @@ class Data(ABC):                                                                
 
 
 @dataclass
+class CustomerSampleFile(Data):
+
+    CUSTOMER_CODE: str
+
+    def __init__(self,customer_code) -> None:
+        self.CUSTOMER_CODE = customer_code
+
+    def write_in_file(self, open_file) -> None:    
+        open_file.write(super().make_mycsv_format((self.CUSTOMER_CODE)))
+
+    def return_key(self) -> str:
+        return self.CUSTOMER_CODE
+    
+
+
+@dataclass
 class Customer(Data):                                                           #data for CUSTOMER.CSV
 
     CUSTOMER_CODE: str
