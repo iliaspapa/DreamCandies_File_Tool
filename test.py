@@ -311,7 +311,7 @@ def generate_customers_and_invoice_items():
     sample = []
     sample_set = set()
 
-    for i in range(10000):
+    for i in range(100):
         random_sample = RandomSample()
         while random_sample.return_key() in sample_set:
             random_sample = RandomSample()
@@ -321,7 +321,7 @@ def generate_customers_and_invoice_items():
     customers = []
     customer_set = set()
 
-    for i in range(10000):
+    for i in range(100):
         random_customer = RandomCustomer()
         while random_customer.return_key() in customer_set:
             random_customer.CUSTOMER_CODE = RandomString(30).get_string()
@@ -332,7 +332,7 @@ def generate_customers_and_invoice_items():
     invoice_set = set()
     fake = Faker()
 
-    for i in range(10000):
+    for i in range(100):
         
         random_invoice = RandomInvoice(fake)
         while random_invoice.return_key() in invoice_set:
@@ -577,7 +577,7 @@ def test_full_light(generate_files):
     while next_ln != '':
         customer = item_reader.split_line(next_ln)
         next_ln = item_reader.next()
-    
+      
 
 # def test_full_hard(generate_files):
 #     pass

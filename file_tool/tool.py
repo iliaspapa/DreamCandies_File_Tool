@@ -46,9 +46,10 @@ class Tool:
             invoice = read_invoices.split_line(next_ln)
             if self.CUSTOMER_SAMPLE_DICT.contains(invoice.CUSTOMER_CODE):
                 invoice.write_in_file(out)
-            self.INVOICE_DICT.add_to_dictionary(read_invoices.split_line(next_ln))
+                self.INVOICE_DICT.add_to_dictionary(read_invoices.split_line(next_ln))
             next_ln = read_invoices.next()
-    
+        print(self.INVOICE_DICT.size(),self.INVOICE_DICT)
+
     def parse_invoice_items(self,file_name) -> None:
 
         read_items = rd.InvoiceItemReader(file_name)

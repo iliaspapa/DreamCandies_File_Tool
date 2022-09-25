@@ -114,7 +114,7 @@ class DataDict(DataCollections):
             i.write_in_file(open_file)
     
     def size(self) -> int:
-        return len(self.DICTIONARY)
+        return self.DICTIONARY.size()
         
 
         
