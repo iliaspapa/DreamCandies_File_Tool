@@ -14,7 +14,7 @@ class Tool:
     def __init__(self,file_name) -> None:
         
         self.CUSTOMER_SAMPLE_DICT = fs.DataDict(type(fd.CustomerSampleFile('')))
-        self.INVOICE_DICT = fs.DataDict(type(fd.Invoice('')))
+        self.INVOICE_DICT = fs.DataDict(type(fd.Invoice('','','','')))
         read_sample = rd.SampleReader(file_name)
 
         next_ln = read_sample.next()
@@ -31,7 +31,7 @@ class Tool:
         next_ln = read_customers.next()
         while next_ln != '':
             customer = read_customers.split_line(next_ln)
-            if self.CUSTOMER_SAMPLE_DICT.contains(customer):
+            if self.CUSTOMER_SAMPLE_DICT.contains(customer.return_key()):
                 customer.write_in_file(out)
             next_ln = read_customers.next()
     
@@ -44,7 +44,7 @@ class Tool:
         next_ln = read_invoices.next()
         while next_ln != '':
             invoice = read_invoices.split_line(next_ln)
-            if self.CUSTOMER_SAMPLE_DICT.contains(invoice):
+            if self.CUSTOMER_SAMPLE_DICT.contains(invoice.CUSTOMER_CODE):
                 invoice.write_in_file(out)
             self.INVOICE_DICT.add_to_dictionary(read_invoices.split_line(next_ln))
             next_ln = read_invoices.next()
@@ -52,13 +52,13 @@ class Tool:
     def parse_invoice_items(self,file_name) -> None:
 
         read_items = rd.InvoiceItemReader(file_name)
-        out = open("INVOCE_ITEMS_TO_TEST.CSV",'w')
+        out = open("INVOICE_ITEMS_TO_TEST.CSV",'w')
         out.write('"INVOICE_CODE","ITEM_CODE","AMOUND","QUANTITY"\n')
 
         next_ln = read_items.next()
         while next_ln != '':
             item = read_items.split_line(next_ln)
-            if self.INVOICE_DICT.contains(item):
+            if self.INVOICE_DICT.contains(item.INVOICE_CODE):
                 item.write_in_file(out)
             next_ln = read_items.next()
                 

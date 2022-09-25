@@ -30,7 +30,7 @@ class Data(ABC):                                                                
     def make_mycsv_format(self,list_of_params) -> str:                          #return data in a printable format
         result = ""
         for i in list_of_params:
-            result+='"'+str(i)+'"'+','
+            result+='"'+str(i)+'",'
         return result[:-1]+'\n'                                                 #don't return last ,
 
 
@@ -43,7 +43,7 @@ class CustomerSampleFile(Data):
         self.CUSTOMER_CODE = customer_code
 
     def write_in_file(self, open_file) -> None:    
-        open_file.write(super().make_mycsv_format((self.CUSTOMER_CODE)))
+        open_file.write(super().make_mycsv_format((self.CUSTOMER_CODE,)))
 
     def return_key(self) -> str:
         return self.CUSTOMER_CODE
@@ -67,6 +67,10 @@ class Customer(Data):                                                           
 
     def write_in_file(self,open_file) -> None:
 
+        # if '"' in self.CUSTOMER_CODE or '"' in self.FIRST_NAME or '"' in self.LAST_NAME :
+        #     print(self.CUSTOMER_CODE,self.FIRST_NAME,self.LAST_NAME)
+        #     exit(-1)
+            
         open_file.write(super().make_mycsv_format((self.CUSTOMER_CODE,
                                                    self.FIRST_NAME,
                                                    self.LAST_NAME)))
@@ -121,7 +125,9 @@ class InvoiceItem(Data):                                                        
     
 
     def write_in_file(self,open_file) -> None:
-
+        # print(self.AMOUND)
+        # if float(self.AMOUND):
+        #     pass
         open_file.write(super().make_mycsv_format((self.INVOICE_CODE,
                                                    self.ITEM_CODE,
                                                    self.AMOUND,

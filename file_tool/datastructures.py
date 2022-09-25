@@ -20,6 +20,10 @@ class DataCollections(ABC):
         def write_in_file(self,open_file) -> None:                                  #write their data in a file
             pass
 
+        @abstractmethod
+        def size(self) -> int:
+            pass
+
 
 
 class DataLists(DataCollections):
@@ -33,7 +37,7 @@ class DataLists(DataCollections):
     
     def append(self,new_entry) -> None:
 
-        if type(new_entry) != self.DATA_TYPE:
+        if not issubclass(type(new_entry), self.DATA_TYPE):
             exit(f"wrong type of data it should be type {self.DATA_TYPE} not \
                                                           {type(new_entry)}")
         self.LIST.append(new_entry)
@@ -46,7 +50,7 @@ class DataLists(DataCollections):
             return self.LIST[index]
 
     def return_remove(self,index):
-        
+
         if index>=len(self.LIST):
             exit("List index out of range")
         else:
@@ -61,6 +65,9 @@ class DataLists(DataCollections):
          for i in self.LIST:
             i.write_in_file(open_file)
 
+    def size(self) -> int:
+        return len(self.LIST)
+
 
 
 class DataDict(DataCollections):
@@ -74,7 +81,7 @@ class DataDict(DataCollections):
 
     def add_to_dictionary(self, new_entry) -> None:
 
-        if type(new_entry) != self.DATA_TYPE:
+        if not issubclass(type(new_entry), self.DATA_TYPE):
             exit(f"wrong type of data it should be type {self.DATA_TYPE} not \
                                                           {type(new_entry)}")
         self.DICTIONARY[new_entry.return_key()] = new_entry
@@ -105,6 +112,9 @@ class DataDict(DataCollections):
     def write_in_file(self, open_file) -> None:
         for i in self.DICTIONARY.values():
             i.write_in_file(open_file)
+    
+    def size(self) -> int:
+        return len(self.DICTIONARY)
         
 
         

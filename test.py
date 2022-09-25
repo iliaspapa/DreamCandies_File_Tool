@@ -7,6 +7,8 @@ from abc import abstractmethod
 
 import file_tool.file_data_classes as fd
 import file_tool.datastructures as ds
+import file_tool.readers as rd
+import file_tool.tool as tool
 
 
 '''
@@ -21,6 +23,7 @@ class RandomString:                                                             
 
     def __init__(self,length):                                                                  #generate a string with
         letters = string.ascii_letters+string.punctuation+string.digits                         #given max length
+        letters = letters.replace('"','')
         self.string = ''.join(random.choice(letters) for i in range(random.randint(1,length)))  #since there are no specs
                                                                                                 #we test with all nonwhitespace
                                                                                                 #printables
@@ -38,10 +41,10 @@ class RandomSample(RandomData,fd.CustomerSampleFile):
 
     def __init__(self,customer_list=[]) -> None:
         
-        if customer_list == []:
+        if customer_list == [] or customer_list.size()==0:
             self.CUSTOMER_CODE = RandomString(30).get_string()
         else:
-            random_index = random.randint(1,len(customer_list)-1)
+            random_index = random.randint(0,customer_list.size()-1)
             random_sample = customer_list.return_remove(random_index)
             self.CUSTOMER_CODE = random_sample.CUSTOMER_CODE
     
@@ -59,25 +62,25 @@ class RandomInvoice(RandomData,fd.Invoice):
 
     def __init__(self,fake,customer_list = []) -> None:
         
-        if customer_list == []:
+        if customer_list == [] or customer_list.size() == 0:
             self.CUSTOMER_CODE = RandomString(30).get_string()
         else:
-            random_index = random.randint(1,len(customer_list)-1)
-            self.CUSTOMER_CODE = customer_list[random_index].CUSTOMER_CODE
+            random_index = random.randint(0,customer_list.size()-1)
+            self.CUSTOMER_CODE = customer_list[random_index].return_key()
         
         self.INVOICE_CODE = RandomString(30).get_string()
         self.AMOUND = random.uniform(0.0,1000.0)
-        self.DATE = fake.date_time_between(start_date='-30y', end_date='+30y')
+        self.DATE = fake.date_between(start_date='-30y', end_date='+30y')
 
 class RandomInvoiceItem(RandomData,fd.InvoiceItem):
 
     def __init__(self,invoice_list = []) -> None:
 
-        if invoice_list == []:
+        if invoice_list == [] or invoice_list.size() == 0:
             self.INVOICE_CODE = RandomString(30).get_string()
         else:
-            random_index = random.randint(1,len(invoice_list)-1)
-            self.INVOICE_CODE = invoice_list[random_index]
+            random_index = random.randint(0,invoice_list.size()-1)
+            self.INVOICE_CODE = invoice_list[random_index].return_key()
 
         self.ITEM_CODE = RandomString(30).get_string()
         self.AMOUND = random.uniform(0.0,1000.0)
@@ -151,7 +154,7 @@ def generate_invoices():
         customere_code = RandomString(30)
         invoice_code = RandomString(30)
         amound = random.uniform(0.0,1000.0)
-        date = fake.date_time_between(start_date='-30y', end_date='+30y')
+        date = fake.date_between(start_date='-30y', end_date='+30y')
         invoices.append((customere_code.get_string(),invoice_code.get_string(),amound,date))
     
     return invoices
@@ -402,9 +405,181 @@ def test_data_dict(generate_customers_and_invoice_items):
         
         assert filecmp.cmp("tmp1.csv","tmp2.csv")
 
+'''
+            Test read classes
+'''
 
-# @pytest.fixture
-# def generate_sample_file():
-#     with open('CUSTOMER_CODE.CSV','w') as file:
-#         for i in range(1000):
+@pytest.fixture
+def generate_files():
 
+    customer_size = 50
+    sample_size = 10
+    invoice_size = 100
+    item_size = 500
+
+    customers = ds.DataLists(type(fd.Customer('','','')))
+    customer_set = set()
+
+    with open('CUSTOMER.CSV','w') as file:
+
+        file.write('"CUSTOMER_CODE","FIRSTNAME","LASTNAME"\n')
+        for i in range(customer_size):
+            random_customer = RandomCustomer()
+            while random_customer.return_key() in customer_set:
+                random_customer.CUSTOMER_CODE = RandomString(30).get_string()
+            customers.append(random_customer)
+            customer_set.add(random_customer.return_key())
+
+            random_customer.write_in_file(file)
+    
+    
+    indices = random.sample(range(1,customers.size()),sample_size)
+    customer_sample = ds.DataLists(type(fd.Customer('','','')))
+    for index in indices:
+        customer_sample.append(customers[index])
+    
+    
+    samples = ds.DataLists(type(fd.CustomerSampleFile('')))
+    
+    with open('CUSTOMER_SAMPLE.CSV','w') as file:
+
+        file.write('"CUSTOMER_CODE"\n')
+
+        for i in range(sample_size):
+            random_sample = RandomSample(customer_sample)
+            samples.append(random_sample)
+            random_sample.write_in_file(file)
+
+
+
+    invoices = ds.DataLists(type(fd.Invoice('','','','')))
+    invoice_set = set()
+
+    with open('INVOICE.CSV','w') as file:
+
+        file.write('"CUSTOMER_CODE","INVOICE_CODE","AMOUNT","DATE"\n')
+        fake = Faker()
+
+        for i in range(invoice_size):
+            random_invoice = RandomInvoice(fake,customer_list=customers)
+            while random_invoice.return_key() in invoice_set:
+                random_invoice.INVOICE_CODE = RandomString(30).get_string()
+            invoices.append(random_invoice)
+            invoice_set.add(random_invoice.return_key())
+
+            random_invoice.write_in_file(file)
+    
+
+    items = ds.DataLists(type(fd.InvoiceItem('','','','')))
+    item_set = set()
+
+    with open('INVOICE_ITEM.CSV','w') as file:
+
+        file.write('"INVOICE_CODE","ITEM_CODE","AMOUNT","QUANTITY"\n')
+
+        for i in range(item_size):
+            random_item = RandomInvoiceItem(invoice_list=invoices)
+            while random_item.return_key() in item_set:
+                random_item.ITEM_CODE = RandomString(30).get_string()
+            items.append(random_item)
+            item_set.add(random_item.return_key())
+
+            # print(random_item.ITEM_CODE,random_item.AMOUND)
+            random_item.write_in_file(file)
+    
+    return samples,customers,invoices,items
+
+def test_readers(generate_files):
+
+    samples,customers,invoices,items = generate_files
+
+
+    sample_reader = rd.SampleReader("CUSTOMER_SAMPLE.CSV")
+    next_ln = sample_reader.next()
+    index = 0
+
+    while next_ln != '':
+        params = (samples[index].CUSTOMER_CODE,)
+        target = samples[index].make_mycsv_format(params)
+        assert  target == next_ln
+        assert  target == sample_reader.split_line(next_ln).make_mycsv_format(params)
+        next_ln = sample_reader.next()
+        index += 1
+
+
+    customer_reader = rd.CustomerReader("CUSTOMER.CSV")
+    next_ln = customer_reader.next()
+    index = 0
+
+    while next_ln != '':
+        params = (customers[index].CUSTOMER_CODE,customers[index].FIRST_NAME,\
+                                                 customers[index].LAST_NAME)
+        target = customers[index].make_mycsv_format(params)
+        assert  target == next_ln
+        assert  target == customer_reader.split_line(next_ln).make_mycsv_format(params)
+        next_ln = customer_reader.next()
+        index += 1
+
+    
+    invoice_reader = rd.InvoiceReader("INVOICE.CSV")
+    next_ln = invoice_reader.next()
+    index = 0
+
+    while next_ln != '':
+        params = (invoices[index].CUSTOMER_CODE,invoices[index].INVOICE_CODE,\
+                            invoices[index].AMOUND,invoices[index].DATE)
+        target = invoices[index].make_mycsv_format(params)
+        assert  target == next_ln
+        assert  target == invoice_reader.split_line(next_ln).make_mycsv_format(params)
+        next_ln = invoice_reader.next()
+        index += 1
+    
+
+    item_reader = rd.InvoiceItemReader("INVOICE_ITEM.CSV")
+    next_ln = item_reader.next()
+    index = 0
+
+    while next_ln != '':
+        params = (items[index].INVOICE_CODE,items[index].ITEM_CODE,\
+                         items[index].AMOUND,items[index].QUANTITY)
+        target = items[index].make_mycsv_format(params)
+        assert  target == next_ln
+        assert  target == item_reader.split_line(next_ln).make_mycsv_format(params)
+        next_ln = item_reader.next()
+        index += 1
+
+'''
+        Test full tool
+'''
+
+def test_full_light(generate_files):
+    
+    tool.run('CUSTOMER_SAMPLE.CSV','CUSTOMER.CSV','INVOICE.CSV','INVOICE_ITEM.CSV')
+    
+    customer_reader = rd.CustomerReader("CUSTOMERS_TO_TEST.CSV")
+    next_ln = customer_reader.next()
+
+    while next_ln != '':
+        customer = customer_reader.split_line(next_ln)
+        next_ln = customer_reader.next()
+    
+    invoice_reader = rd.InvoiceReader("INVOICES_TO_TEST.CSV")
+    next_ln = invoice_reader.next()
+
+    while next_ln != '':
+        invoice = invoice_reader.split_line(next_ln)
+        next_ln = invoice_reader.next()
+    
+
+    item_reader = rd.InvoiceItemReader("INVOICE_ITEMS_TO_TEST.CSV")
+    next_ln = item_reader.next()
+
+    while next_ln != '':
+        customer = item_reader.split_line(next_ln)
+        next_ln = item_reader.next()
+    
+
+# def test_full_hard(generate_files):
+#     pass
+
+    
