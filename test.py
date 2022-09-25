@@ -3,6 +3,7 @@ import string
 import random
 from faker import Faker
 import filecmp
+from abc import abstractmethod
 
 import file_tool.file_data_classes as fd
 import file_tool.datastructures as ds
@@ -26,6 +27,62 @@ class RandomString:                                                             
 
     def get_string(self):                                                                       #return string
         return self.string
+
+class RandomData(fd.Data):
+
+    @abstractmethod
+    def __init__(self) -> None:
+        pass
+
+class RandomSample(RandomData,fd.CustomerSampleFile):
+
+    def __init__(self,customer_list=[]) -> None:
+        
+        if customer_list == []:
+            self.CUSTOMER_CODE = RandomString(30).get_string()
+        else:
+            random_index = random.randint(1,len(customer_list)-1)
+            random_sample = customer_list.return_remove(random_index)
+            self.CUSTOMER_CODE = random_sample.CUSTOMER_CODE
+    
+
+class RandomCustomer(RandomData,fd.Customer):
+
+    def __init__(self) -> None:
+        
+        self.CUSTOMER_CODE = RandomString(30).get_string()
+        self.FIRST_NAME = RandomString(100).get_string()
+        self.LAST_NAME = RandomString(100).get_string()
+
+
+class RandomInvoice(RandomData,fd.Invoice):
+
+    def __init__(self,fake,customer_list = []) -> None:
+        
+        if customer_list == []:
+            self.CUSTOMER_CODE = RandomString(30).get_string()
+        else:
+            random_index = random.randint(1,len(customer_list)-1)
+            self.CUSTOMER_CODE = customer_list[random_index].CUSTOMER_CODE
+        
+        self.INVOICE_CODE = RandomString(30).get_string()
+        self.AMOUND = random.uniform(0.0,1000.0)
+        self.DATE = fake.date_time_between(start_date='-30y', end_date='+30y')
+
+class RandomInvoiceItem(RandomData,fd.InvoiceItem):
+
+    def __init__(self,invoice_list = []) -> None:
+
+        if invoice_list == []:
+            self.INVOICE_CODE = RandomString(30).get_string()
+        else:
+            random_index = random.randint(1,len(invoice_list)-1)
+            self.INVOICE_CODE = invoice_list[random_index]
+
+        self.ITEM_CODE = RandomString(30).get_string()
+        self.AMOUND = random.uniform(0.0,1000.0)
+        self.QUANTITY = random.randint(1,100)
+        
 
 '''
             Test file_data_classes.customers
@@ -193,6 +250,52 @@ def test_dataclass_invoice_items_return_key(generate_invoice_items):
         item_object = fd.InvoiceItem(item[0],item[1],item[2],item[3])
         assert item_object.return_key() == item[1]
 
+'''
+        Test file_data_classes.sample
+'''
+
+@pytest.fixture
+def generate_sample():
+
+    samples = []
+
+    for i in range(100):
+        customer_code = RandomString(30)
+        samples.append((customer_code.get_string()))
+    
+    return samples
+
+
+
+def test_dataclass_sample_init(generate_sample):
+    for code in generate_sample:
+        sample_object = fd.CustomerSampleFile(code[0])
+        assert sample_object.CUSTOMER_CODE == code[0]
+
+
+
+def test_dataclass_sample_write_in_file(generate_sample):
+    
+    with open("tmp.csv",'w') as temp_file:
+        for code in generate_sample:
+            sample_object = fd.CustomerSampleFile(code[0])
+            sample_object.write_in_file(temp_file)
+    
+    with open("tmp.csv",'r') as temp_file:
+        cnt = 0
+        for line in temp_file:
+
+            assert cnt<len(generate_sample)
+
+            correct_format = '"'+generate_sample[cnt][0]+'"\n'
+
+            assert line==correct_format
+            cnt+=1
+
+def test_dataclass_sample_return_key(generate_sample):
+    for code in generate_sample:
+        sample_object = fd.CustomerSampleFile(code[0])
+        assert sample_object.return_key() == code[0]
 
 
 '''
@@ -202,26 +305,52 @@ def test_dataclass_invoice_items_return_key(generate_invoice_items):
 @pytest.fixture
 def generate_customers_and_invoice_items():
 
+    sample = []
+    sample_set = set()
+
+    for i in range(10000):
+        random_sample = RandomSample()
+        while random_sample.return_key() in sample_set:
+            random_sample = RandomSample()
+        sample.append(random_sample)
+        sample_set.add(random_sample.return_key())
+
     customers = []
+    customer_set = set()
 
-    for i in range(100):
-        customer_code = RandomString(30)
-        first_name = RandomString(100)
-        last_name = RandomString(100)
-        customers.append(fd.Customer(customer_code.get_string(),first_name.get_string()\
-                                                               ,last_name.get_string()))
+    for i in range(10000):
+        random_customer = RandomCustomer()
+        while random_customer.return_key() in customer_set:
+            random_customer.CUSTOMER_CODE = RandomString(30).get_string()
+        customers.append(random_customer)
+        customer_set.add(random_customer.CUSTOMER_CODE)
     
+    invoices = []
+    invoice_set = set()
+    fake = Faker()
+
+    for i in range(10000):
+        
+        random_invoice = RandomInvoice(fake)
+        while random_invoice.return_key() in invoice_set:
+            random_invoice.INVOICE_CODE = RandomString(30).get_string()
+        invoices.append(random_invoice)
+        invoice_set.add(random_invoice.return_key())
+
+
     items = []
+    item_set = set()
 
-    for i in range(100):
-        invoice_code = RandomString(30)
-        item_code = RandomString(30)
-        amound = random.uniform(0.0,1000.0)
-        quantity = random.randint(1,100)
-        items.append(fd.InvoiceItem(invoice_code.get_string(),item_code.get_string(),\
-                                                                    amound,quantity))
-    
-    return customers, items
+    for i in range(10000):
+        random_item = RandomInvoiceItem()
+        while random_item.return_key() in item_set:
+            random_item.ITEM_CODE = RandomString(30).get_string()
+        items.append(random_item)
+        item_set.add(random_item.return_key())
+
+
+
+    return sample, customers, invoices, items
 
 def test_data_list(generate_customers_and_invoice_items):
     
@@ -246,7 +375,7 @@ def test_data_list(generate_customers_and_invoice_items):
 def test_data_dict(generate_customers_and_invoice_items):
 
     for collection in generate_customers_and_invoice_items:
-
+        
         dd = ds.DataDict(type(collection[0]))
         for entry in collection:
             dd.add_to_dictionary(entry)
@@ -261,6 +390,9 @@ def test_data_dict(generate_customers_and_invoice_items):
         dd2_result = dd2.return_list()
         assert dd2_result == collection
 
+        for entry in collection:
+            assert dd.contains(entry.return_key())
+
         with open("tmp1.csv",'w') as temp_file:
             dd.write_in_file(temp_file)
         
@@ -269,3 +401,10 @@ def test_data_dict(generate_customers_and_invoice_items):
                 entry.write_in_file(temp_file)
         
         assert filecmp.cmp("tmp1.csv","tmp2.csv")
+
+
+# @pytest.fixture
+# def generate_sample_file():
+#     with open('CUSTOMER_CODE.CSV','w') as file:
+#         for i in range(1000):
+

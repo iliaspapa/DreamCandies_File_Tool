@@ -11,20 +11,20 @@ class Tool:
     INVOICE_DICT: fs.DataDict
 
 
-    def __init__(self) -> None:
+    def __init__(self,file_name) -> None:
         
         self.CUSTOMER_SAMPLE_DICT = fs.DataDict(type(fd.CustomerSampleFile('')))
         self.INVOICE_DICT = fs.DataDict(type(fd.Invoice('')))
-        read_sample = rd.SampleReader(sys.argv[1])
+        read_sample = rd.SampleReader(file_name)
 
         next_ln = read_sample.next()
         while next_ln != '':
             self.CUSTOMER_SAMPLE_DICT.add_to_dictionary(read_sample.split_line(next_ln))
             next_ln = read_sample.next()
     
-    def parse_customers(self) -> None:
+    def parse_customers(self,file_name) -> None:
 
-        read_customers = rd.CustomerReader(sys.argv[2])
+        read_customers = rd.CustomerReader(file_name)
         out = open("CUSTOMERS_TO_TEST.CSV",'w')
         out.write('"CUSTOMER_CODE","FIRST_NAME","LAST_NAME"\n')
 
@@ -35,9 +35,9 @@ class Tool:
                 customer.write_in_file(out)
             next_ln = read_customers.next()
     
-    def parse_invoices(self) -> None:
+    def parse_invoices(self,file_name) -> None:
 
-        read_invoices = rd.InvoiceReader(sys.argv[3])
+        read_invoices = rd.InvoiceReader(file_name)
         out = open("INVOICES_TO_TEST.CSV",'w')
         out.write('"CUSTOMER_CODE","INVOICE_CODE","AMOUND","DATE"\n')
 
@@ -49,9 +49,9 @@ class Tool:
             self.INVOICE_DICT.add_to_dictionary(read_invoices.split_line(next_ln))
             next_ln = read_invoices.next()
     
-    def parse_invoice_items(self) -> None:
+    def parse_invoice_items(self,file_name) -> None:
 
-        read_items = rd.InvoiceItemReader(sys.argv[4])
+        read_items = rd.InvoiceItemReader(file_name)
         out = open("INVOCE_ITEMS_TO_TEST.CSV",'w')
         out.write('"INVOICE_CODE","ITEM_CODE","AMOUND","QUANTITY"\n')
 
@@ -65,11 +65,11 @@ class Tool:
                 
 
 
-def run():
-    solve = Tool()
-    solve.parse_customers()
-    solve.parse_invoices()
-    solve.parse_invoice_items()
+def run(file1,file2,file3,file4):
+    solve = Tool(file1)
+    solve.parse_customers(file2)
+    solve.parse_invoices(file3)
+    solve.parse_invoice_items(file4)
 
 if __name__ == '__main__':
-    run()
+    run(sys.argv[1],sys.argv[2],sys.argv[3],sys.argv[4])

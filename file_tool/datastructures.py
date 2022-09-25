@@ -37,6 +37,22 @@ class DataLists(DataCollections):
             exit(f"wrong type of data it should be type {self.DATA_TYPE} not \
                                                           {type(new_entry)}")
         self.LIST.append(new_entry)
+    
+    def __getitem__(self,index):
+        
+        if index>=len(self.LIST):
+            exit("List index out of range")
+        else:
+            return self.LIST[index]
+
+    def return_remove(self,index):
+        
+        if index>=len(self.LIST):
+            exit("List index out of range")
+        else:
+            ret = self.LIST[index]
+            self.LIST.remove(ret)
+            return ret
 
     def return_list(self) -> list:
          return self.LIST

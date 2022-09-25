@@ -13,6 +13,7 @@ class Reader(ABC):
 
     def __init__(self,filename) -> None:
         self.OPEN_FILE = open(filename,'r')
+        self.OPEN_FILE.readline()
 
     def next(self) -> str:
         ln =  self.OPEN_FILE.readline()
