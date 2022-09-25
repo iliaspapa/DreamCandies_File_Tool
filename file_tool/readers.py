@@ -35,7 +35,7 @@ class Reader(ABC):
         return res
 
 
-class CustomerSampleFile(Reader):
+class SampleReader(Reader):
 
     def __init__(self, filename) -> None:
         super().__init__(filename)

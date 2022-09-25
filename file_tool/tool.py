@@ -1,7 +1,75 @@
-       
+import sys
+
+
+import file_tool.file_data_classes as fd
+import file_tool.datastructures as fs
+import file_tool.readers as rd
+
+class Tool:
+
+    CUSTOMER_SAMPLE_DICT: fs.DataDict
+    INVOICE_DICT: fs.DataDict
+
+
+    def __init__(self) -> None:
+        
+        self.CUSTOMER_SAMPLE_DICT = fs.DataDict(type(fd.CustomerSampleFile('')))
+        self.INVOICE_DICT = fs.DataDict(type(fd.Invoice('')))
+        read_sample = rd.SampleReader(sys.argv[1])
+
+        next_ln = read_sample.next()
+        while next_ln != '':
+            self.CUSTOMER_SAMPLE_DICT.add_to_dictionary(read_sample.split_line(next_ln))
+            next_ln = read_sample.next()
+    
+    def parse_customers(self) -> None:
+
+        read_customers = rd.CustomerReader(sys.argv[2])
+        out = open("CUSTOMERS_TO_TEST.CSV",'w')
+        out.write('"CUSTOMER_CODE","FIRST_NAME","LAST_NAME"\n')
+
+        next_ln = read_customers.next()
+        while next_ln != '':
+            customer = read_customers.split_line(next_ln)
+            if self.CUSTOMER_SAMPLE_DICT.contains(customer):
+                customer.write_in_file(out)
+            next_ln = read_customers.next()
+    
+    def parse_invoices(self) -> None:
+
+        read_invoices = rd.InvoiceReader(sys.argv[3])
+        out = open("INVOICES_TO_TEST.CSV",'w')
+        out.write('"CUSTOMER_CODE","INVOICE_CODE","AMOUND","DATE"\n')
+
+        next_ln = read_invoices.next()
+        while next_ln != '':
+            invoice = read_invoices.split_line(next_ln)
+            if self.CUSTOMER_SAMPLE_DICT.contains(invoice):
+                invoice.write_in_file(out)
+            self.INVOICE_DICT.add_to_dictionary(read_invoices.split_line(next_ln))
+            next_ln = read_invoices.next()
+    
+    def parse_invoice_items(self) -> None:
+
+        read_items = rd.InvoiceItemReader(sys.argv[4])
+        out = open("INVOCE_ITEMS_TO_TEST.CSV",'w')
+        out.write('"INVOICE_CODE","ITEM_CODE","AMOUND","QUANTITY"\n')
+
+        next_ln = read_items.next()
+        while next_ln != '':
+            item = read_items.split_line(next_ln)
+            if self.INVOICE_DICT.contains(item):
+                item.write_in_file(out)
+            next_ln = read_items.next()
+                
+                
+
 
 def run():
-    pass
+    solve = Tool()
+    solve.parse_customers()
+    solve.parse_invoices()
+    solve.parse_invoice_items()
 
 if __name__ == '__main__':
     run()

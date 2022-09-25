@@ -80,6 +80,9 @@ class DataDict(DataCollections):
         
         self.add_to_dictionary(value)
     
+    def contains(self,key):
+        return key in self.DICTIONARY
+
     def return_list(self) -> list:
         return list(self.DICTIONARY.values())
     
