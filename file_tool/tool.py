@@ -57,7 +57,7 @@ class Tool:                                                                     
     def parse_invoice_items(self,file_name) -> None:                                    #read and write invoice items
 
         read_items = rd.InvoiceItemReader(file_name)
-        out = open("INVOICE_ITEMS_TO_TEST.CSV",'w')
+        out = open(f"{file_name[:-4]}_TO_TEST.CSV",'w')
         out.write('"INVOICE_CODE","ITEM_CODE","AMOUND","QUANTITY"\n')
 
         next_ln = read_items.next()

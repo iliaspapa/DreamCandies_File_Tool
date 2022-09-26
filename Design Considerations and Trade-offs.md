@@ -25,3 +25,7 @@ Specificly, Customer_Samples could have been saved in a set because they have on
 Automated Testing was done in an as-you-go basis. It is defenetly both slower and worse for expanding and maintaining. This is less important because accept from the Utilities which are well writen, tests will be added with functionality. 
 
 That being said if I had to do the project again more thought would have gone in struucturing the testing.
+
+Also testing is done progressively. Classes are tested and then usued in subsequent tests.
+
+There needs to be one more test for missing entries from the input files

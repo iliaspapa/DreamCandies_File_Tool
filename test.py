@@ -421,10 +421,10 @@ class FileGenerationFixture:
     @pytest.fixture
     def generate_files(self):
 
-        customer_size = 5000
-        sample_size = 10
-        invoice_size = 10000
-        item_size = 50000
+        customer_size = 500000
+        sample_size = 1000
+        invoice_size = 1000000
+        item_size = 5000000
 
         customers = ds.DataLists(type(fd.Customer('','','')))
         customer_set = set()
@@ -568,34 +568,76 @@ class TestFull(FileGenerationFixture):
         _,_,_,_,sample_size = generate_files
         tool.run('CUSTOMER_SAMPLE.CSV','CUSTOMER.CSV','INVOICE.CSV','INVOICE_ITEM.CSV')
         
-        customer_reader = rd.CustomerReader("CUSTOMERS_TO_TEST.CSV")
+        customer_reader = rd.CustomerReader("CUSTOMER_TO_TEST.CSV")
         next_ln = customer_reader.next()
         cnt = 0
 
         while next_ln != '':
-            customer = customer_reader.split_line(next_ln)
+            _ = customer_reader.split_line(next_ln)
             next_ln = customer_reader.next()
             cnt += 1
         
         assert cnt == sample_size
 
-        invoice_reader = rd.InvoiceReader("INVOICES_TO_TEST.CSV")
+        invoice_reader = rd.InvoiceReader("INVOICE_TO_TEST.CSV")
         next_ln = invoice_reader.next()
 
         while next_ln != '':
-            invoice = invoice_reader.split_line(next_ln)
+            _ = invoice_reader.split_line(next_ln)
             next_ln = invoice_reader.next()
         
 
-        item_reader = rd.InvoiceItemReader("INVOICE_ITEMS_TO_TEST.CSV")
+        item_reader = rd.InvoiceItemReader("INVOICE_ITEM_TO_TEST.CSV")
         next_ln = item_reader.next()
 
         while next_ln != '':
-            customer = item_reader.split_line(next_ln)
+            _ = item_reader.split_line(next_ln)
             next_ln = item_reader.next()
         
 
-    # def test_full_hard(self,generate_files):
-    #     pass
+    def test_full_hard(self,generate_files):
+        
+        samples,customers,invoices,items,sample_size = generate_files
 
+        tool.run('CUSTOMER_SAMPLE.CSV','CUSTOMER.CSV','INVOICE.CSV','INVOICE_ITEM.CSV')
+
+        customer_reader = rd.CustomerReader("CUSTOMER_TO_TEST.CSV")
+        next_ln = customer_reader.next()
+        customer_codes = {}
+        cnt = 0
+
+        while next_ln != '':
+            customer = customer_reader.split_line(next_ln)
+            if customer.CUSTOMER_CODE not in customer_codes:
+                customer_codes[customer.CUSTOMER_CODE] = 1
+            else:
+                customer_codes[customer.CUSTOMER_CODE] += 1
+            next_ln = customer_reader.next()
+            cnt += 1   
+
+        assert cnt == sample_size
+
+        invoice_reader = rd.InvoiceReader("INVOICE_TO_TEST.CSV")
+        next_ln = invoice_reader.next()
+        invoice_codes = {}
+
+        while next_ln != '':
+            invoice = invoice_reader.split_line(next_ln)
+            assert invoice.CUSTOMER_CODE in customer_codes
+            if invoice.INVOICE_CODE not in invoice_codes:
+                invoice_codes[invoice.INVOICE_CODE] = 1
+            else:
+                invoice_codes[invoice.INVOICE_CODE] += 1
+            next_ln = invoice_reader.next()
+
+        
+        print(invoice_codes)
+        item_reader = rd.InvoiceItemReader("INVOICE_ITEM_TO_TEST.CSV")
+        next_ln = item_reader.next()
+
+        while next_ln != '':
+            item = item_reader.split_line(next_ln)
+            assert item.INVOICE_CODE in invoice_codes
+            # invoice_codes[item.INVOICE_CODE] -= 1
+            next_ln = item_reader.next()
         

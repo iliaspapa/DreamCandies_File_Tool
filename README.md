@@ -217,4 +217,5 @@ classes: FileGenerationFixture, TestReaders, Testfull
 - TestReaders: tests the readers classes using the generated files.
     - test_reader (test): the functiton that implements the above.
 - TestFull: This class conducts end-to-end testing of the tool.
-    - test_full_light: call the full tool on the files generated and check that result file exist and have no major errors. Note: this does not fully check if results are correct.
+    - test_full_light: call the full tool on the files generated and check that result files exist and have no major errors. Note: this does not fully check if results are correct.
+    - test_full_hard: call the full tool on the files generated and do some concistency checking on the resulting files. Note: there are possible errors still missed.
