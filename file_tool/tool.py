@@ -1,9 +1,13 @@
 import sys
 
-
-import file_tool.file_data_classes as fd
-import file_tool.datastructures as fs
-import file_tool.readers as rd
+if "pytest" in sys.modules:
+    import file_tool.file_data_classes as fd
+    import file_tool.datastructures as fs
+    import file_tool.readers as rd
+else:
+    import file_data_classes as fd
+    import datastructures as fs
+    import readers as rd
 
 class Tool:
 
@@ -48,7 +52,7 @@ class Tool:
                 invoice.write_in_file(out)
                 self.INVOICE_DICT.add_to_dictionary(read_invoices.split_line(next_ln))
             next_ln = read_invoices.next()
-        print(self.INVOICE_DICT.size(),self.INVOICE_DICT)
+        # print(self.INVOICE_DICT.size(),self.INVOICE_DICT)
 
     def parse_invoice_items(self,file_name) -> None:
 

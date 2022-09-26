@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
+import sys
 import datetime 
 import io
 
-import file_tool.file_data_classes as fd
-
-
-
+if "pytest" in sys.modules:
+    import file_tool.file_data_classes as fd
+else:
+    import file_data_classes as fd
 
 class Reader(ABC):
 

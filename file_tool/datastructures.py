@@ -1,8 +1,11 @@
 from sys import exit
+import sys
 from abc import ABC, abstractmethod
 
-
-import file_tool.file_data_classes as fd
+if "pytest" in sys.modules:
+    import file_tool.file_data_classes as fd
+else:
+    import file_data_classes as fd
 
 
 class DataCollections(ABC):
@@ -114,7 +117,7 @@ class DataDict(DataCollections):
             i.write_in_file(open_file)
     
     def size(self) -> int:
-        return self.DICTIONARY.size()
+        return len(self.DICTIONARY)
         
 
         

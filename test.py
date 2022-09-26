@@ -344,7 +344,7 @@ def generate_customers_and_invoice_items():
     items = []
     item_set = set()
 
-    for i in range(10000):
+    for i in range(100):
         random_item = RandomInvoiceItem()
         while random_item.return_key() in item_set:
             random_item.ITEM_CODE = RandomString(30).get_string()
@@ -412,10 +412,10 @@ def test_data_dict(generate_customers_and_invoice_items):
 @pytest.fixture
 def generate_files():
 
-    customer_size = 50
+    customer_size = 5000
     sample_size = 10
-    invoice_size = 100
-    item_size = 500
+    invoice_size = 10000
+    item_size = 50000
 
     customers = ds.DataLists(type(fd.Customer('','','')))
     customer_set = set()
