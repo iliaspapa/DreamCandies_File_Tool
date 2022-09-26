@@ -1,7 +1,5 @@
 # Design
 
-<h1><center> Main Tool </center></h1>
-
 <h2> Class Structure </h2>
 
 In order to have an easy to maintain and expand code, most "endpoint" classes inherit from one abstract template class. But for performance and maintainability reasons, complecated inheritance stractures are avoided.
@@ -22,4 +20,8 @@ When saving data in a dictionary, the "primary key" is used as key, and the hole
 
 Specificly, Customer_Samples could have been saved in a set because they have only one value. This way again is preferable because it is more modular and it is resiliant in the case more fields are added.
 
-<h1><center> Automated Testing of Tool </center></h1>
+<h2> Automated Testing of Tool </h2>
+
+Automated Testing was done in an as-you-go basis. It is defenetly both slower and worse for expanding and maintaining. This is less important because accept from the Utilities which are well writen, tests will be added with functionality. 
+
+That being said if I had to do the project again more thought would have gone in struucturing the testing.
