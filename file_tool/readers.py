@@ -23,7 +23,7 @@ class Reader(ABC):
             self.OPEN_FILE.close()
         return ln
     
-    def split_line(self,full_line) -> str:
+    def split_line(self,full_line) -> list:
         res = []
         argument = ""
         chr = 1
