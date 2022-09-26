@@ -1,5 +1,5 @@
 # DreamCandies_File_Tool
-
+Tested on Windows 10 Home and Ubuntu 20.04 LTS
 ## - Main Tool
 ## - Automated Testing of tool
 <br><br>
