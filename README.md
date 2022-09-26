@@ -84,12 +84,12 @@ classes: DataCollections(template), DataLists, DataDict
     - size (method): returns the size of the container.
 - DataDict (inherits: DataCollections): This class implements a dictionary of items that have a specific type. The methods implemented are what are used so far.
     - DICTIONARY (attribute:dict).
-    - add_to_dictionary (method): gets an [appropriate key](#a-namereturnkeyitema).
+    - add_to_dictionary (method): gets an [appropriate key](#return_key_item).
     - \_\_getitem__ (operator [] read): returns an item at a given key.
     - \_\_setitem__ (operator [] write): see add_to_dictionary
     - contains (method): returns True if key is in dictionary.
     - return_list (method): returns container as a simple list.
-    - write_in_file (method): calls the [write_in_file method for any object](#a-namewriteinfileitema) in the container.
+    - write_in_file (method): calls the [write_in_file method for any object](#write_in_file_item) in the container.
     - size (method): returns the size of the container.
 
 
