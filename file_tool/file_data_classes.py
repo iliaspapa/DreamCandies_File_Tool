@@ -35,7 +35,7 @@ class Data(ABC):                                                                
 
 
 @dataclass
-class CustomerSampleFile(Data):
+class CustomerSampleFile(Data):                                                 #data for CUSTOMER_SAMPLE.CSV
 
     CUSTOMER_CODE: str
 
