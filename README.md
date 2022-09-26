@@ -119,7 +119,7 @@ classes: Reader(template), SamleReader, CustomerReader, InvoiceReader, InvoiceIt
     - split_line (method): calls Reader.split_line() to get a list of strings and returns a InvoiceItem object.
 
 
-<h3> Tool Classe </h3>
+<h3> Tool Class </h3>
 
 
 file: "tool.py"
@@ -134,7 +134,7 @@ classes: Tool
     - parse_invoices (method): Gets the filename for the Invoice file, parses the file and prints in the file all data for the invoices of customers found on the CUSTOMER_SAMPLE_DICT. Also, saves all data from those invoices.
     - parse_invoice_items (method): Gets the filename for the Invoice_Items file, parses the file and prints in the file all data for the items of invoices found on the INVOICE_DICT.
 
-<h1><b><center>Automated Testing of Tool</center></b></h1>
+<h1><center>Automated Testing of Tool</center></h1>
 
 <h2>How to use</h2>
 
